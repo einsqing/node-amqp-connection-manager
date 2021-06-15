@@ -179,7 +179,11 @@ export default class AmqpConnectionManager extends EventEmitter {
                 });
 
                 // Reconnect if the connection closes
-                connection.on('close', err => {
+                connection.on('close', async err => {
+                    try {
+                        await connection.close();
+                    } catch (err) {}
+
                     this._currentConnection = null;
                     this.emit('disconnect', { err });
 
