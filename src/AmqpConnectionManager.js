@@ -168,14 +168,14 @@ export default class AmqpConnectionManager extends EventEmitter {
 
                 connection.on('unblocked', () => this.emit('unblocked'));
 
-                connection.on('error', (/* err */) => {
+                connection.on('error', async (/* err */) => {
                     // if this event was emitted, then the connection was already closed,
                     // so no need to call #close here
                     // also, 'close' is emitted after 'error',
                     // so no need for work already done in 'close' handler
                     try {
-                        connection.close();
-                    } catch (error) {}
+                        await connection.close();
+                    } catch (err) {}
                 });
 
                 // Reconnect if the connection closes
