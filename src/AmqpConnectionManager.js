@@ -174,7 +174,7 @@ export default class AmqpConnectionManager extends EventEmitter {
                     // also, 'close' is emitted after 'error',
                     // so no need for work already done in 'close' handler
                     try {
-                        await connection.close();
+                        await this._currentConnection.close();
                     } catch (err) {
                         console.log('connection err', err.message);
                     }
@@ -183,7 +183,7 @@ export default class AmqpConnectionManager extends EventEmitter {
                 // Reconnect if the connection closes
                 connection.on('close', async err => {
                     try {
-                        await connection.close();
+                        await this._currentConnection.close();
                     } catch (err) {
                         console.log('connection err', err.message);
                     }
@@ -207,7 +207,13 @@ export default class AmqpConnectionManager extends EventEmitter {
                 return null;
             });
         })
-        .catch(err => {
+        .catch(async err => {
+            try {
+                await this._currentConnection.close();
+            } catch (err) {
+                console.log('connection err', err.message);
+            }
+
             this.emit('disconnect', { err });
 
             // Connection failed...
